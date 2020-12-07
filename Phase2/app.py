@@ -103,6 +103,7 @@ def carChoice(_conn,id):
             brandprice = cursor.fetchall()
             for row in brandprice:
                 print("The base price will be: $",row[0])
+            JeepModel(_conn,id)
         #---------------------------------------------------------------------
         elif bc == 5:
             sql = (""" SELECT b_price FROM Brand WHERE b_name = 'Honda';""")
@@ -111,6 +112,7 @@ def carChoice(_conn,id):
             brandprice = cursor.fetchall()
             for row in brandprice:
                 print("The base price will be: $",row[0])
+            #HondaModel(_conn,id)
         #---------------------------------------------------------------------
         elif bc == 6:
             sql = (""" SELECT b_price FROM Brand WHERE b_name = 'Mazda';""")
@@ -119,6 +121,7 @@ def carChoice(_conn,id):
             brandprice = cursor.fetchall()
             for row in brandprice:
                 print("The base price will be: $",row[0])
+            #MazdaModel(_conn,id)
         else:
             print("Invalid input, try again")
             carChoice(_conn,id)
@@ -591,7 +594,7 @@ def MercedesModel(_conn,id):
         else:
             print('Not a valid number')
             print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-            FordModel(_conn,id)
+            MercedesModel(_conn,id)
     except Error as e:
         print(e)
     
@@ -775,6 +778,224 @@ def MercedesGLEPackage(_conn,id):
 
         #---------------------------------------------------------------------        
         #-------------------------END OF MERCEDES CHOICE----------------------
+        #---------------------------------------------------------------------
+
+        #---------------------------------------------------------------------        
+        #-------------------------START OF JEEP CHOICE--------------------
+        #---------------------------------------------------------------------
+
+def JeepModel(_conn,id):
+    try:
+        cursor = _conn.cursor()
+        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+        print(""" Please select a Car Model""")
+        print("1. Wrangler")
+        print("2. Renegade")
+        mc = int(input("Please select one: "))
+        #---------
+        if mc == 1:
+            sql = ("""SELECT m_price FROM model WHERE m_name = 'Wrangler';""")
+            cursor.execute(sql)
+            _conn.commit()
+            modelprice = cursor.fetchall()
+            for row in modelprice:
+                print("The base price will be: $",row[0])
+            JeepWranglerPackage(_conn,id)
+        elif mc == 2:
+            sql = ("""SELECT m_price FROM model WHERE m_name = 'Renegade';""")
+            cursor.execute(sql)
+            _conn.commit()
+            modelprice = cursor.fetchall()
+            for row in modelprice:
+                print("The base price will be: $",row[0])
+            JeepRenegadePackage(_conn,id)
+        else:
+            print('Not a valid number')
+            print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+            JeepModel(_conn,id)
+    except Error as e:
+        print(e)
+    
+
+def JeepWranglerPackage(_conn,id):
+    try:
+        cursor = _conn.cursor()
+        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+        print(""" Please select a Car Package""")
+        print("""1. Heavy-Duty Electrical""")
+        print("""2. Smokers""")
+        print("""3. NONE""")
+        ec = int(input("Please select one: "))
+        if ec == 1:
+            sql = ("""SELECT e_price FROM extraPackages WHERE e_packkey = 212;""")
+            cursor.execute(sql)
+            _conn.commit()
+            modelprice = cursor.fetchall()
+            for row in modelprice:
+                print("The base price will be: $",row[0])
+            print("Are you satisfied with your choices?")
+            choice = input("Y or N:\n")
+            if choice == 'Y' or 'y':
+                sql = """SELECT (b_price + m_price + e_price) as estimateTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Jeep'
+                AND m_name = 'Wrangler'
+                AND e_name = 'Heavy-Duty Electrical';"""
+                cursor.execute(sql)
+                _conn.commit()
+                estimateprice = cursor.fetchall()
+                for row in estimateprice:
+                    print("The estimate total will be: $",row[0])
+                return
+            if choice == 'N' or 'n':
+                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+                carChoice(_conn,id)  
+        if ec == 2:
+            sql = ("""SELECT e_price FROM extraPackages WHERE e_packkey = 213;""")
+            cursor.execute(sql)
+            _conn.commit()
+            modelprice = cursor.fetchall()
+            for row in modelprice:
+                print("The base price will be: $",row[0])
+            print("Are you satisfied with your choices?")
+            choice = input("Y or N:\n")
+            if choice == 'Y' or 'y':
+                sql = """SELECT (b_price + m_price + e_price) as estimateTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Jeep'
+                AND m_name = 'Wrangler'
+                AND e_name = 'Smokers';"""
+                cursor.execute(sql)
+                _conn.commit()
+                estimateprice = cursor.fetchall()
+                for row in estimateprice:
+                    print("The estimate total will be: $",row[0])
+                return
+            if choice == 'N' or 'n':
+                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+                carChoice(_conn,id)  
+        if ec == 3:
+            sql = ("""SELECT e_price FROM extraPackages WHERE e_packkey = 220;""")
+            cursor.execute(sql)
+            _conn.commit()
+            modelprice = cursor.fetchall()
+            for row in modelprice:
+                print("The base price will be: $",row[0])
+            print("Are you satisfied with your choices?")
+            choice = input("Y or N:\n")
+            if choice == 'Y' or 'y':
+                sql = """SELECT (b_price + m_price) as estimateTOTAL
+                FROM Brand,Model
+                WHERE b_brandkey = m_brandkey
+                AND b_name = 'Jeep'
+                AND m_name = 'Wrangler';"""
+                cursor.execute(sql)
+                _conn.commit()
+                estimateprice = cursor.fetchall()
+                for row in estimateprice:
+                    print("The estimate total will be: $",row[0])
+                return
+            if choice == 'N' or 'n':
+                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+                carChoice(_conn,id)  
+
+    except Error as e:
+        print(e)
+
+def JeepRenegadePackage(_conn,id):
+    try:
+        cursor = _conn.cursor()
+        print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+        print(""" Please select a Car Package""")
+        print("""1. Advanced Technology""")
+        print("""2. Uconnect 8.4""")
+        print("""3. NONE""")
+        ec = int(input("Please select one: "))
+        if ec == 1:
+            sql = ("""SELECT e_price FROM extraPackages WHERE e_packkey = 214;""")
+            cursor.execute(sql)
+            _conn.commit()
+            modelprice = cursor.fetchall()
+            for row in modelprice:
+                print("The base price will be: $",row[0])
+            print("Are you satisfied with your choices?")
+            choice = input("Y or N:\n")
+            if choice == 'Y' or 'y':
+                sql = """SELECT (b_price + m_price + e_price) as estimateTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Jeep'
+                AND m_name = 'Renegade'
+                AND e_name = 'Advanced Technology';"""
+                cursor.execute(sql)
+                _conn.commit()
+                estimateprice = cursor.fetchall()
+                for row in estimateprice:
+                    print("The estimate total will be: $",row[0])
+                return
+            if choice == 'N' or 'n':
+                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+                carChoice(_conn,id)  
+        if ec == 2:
+            sql = ("""SELECT e_price FROM extraPackages WHERE e_packkey = 215;""")
+            cursor.execute(sql)
+            _conn.commit()
+            modelprice = cursor.fetchall()
+            for row in modelprice:
+                print("The base price will be: $",row[0])
+            print("Are you satisfied with your choices?")
+            choice = input("Y or N:\n")
+            if choice == 'Y' or 'y':
+                sql = """SELECT (b_price + m_price + e_price) as estimateTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Jeep'
+                AND m_name = 'Renegade'
+                AND e_name = 'Uconnect 8.4';"""
+                cursor.execute(sql)
+                _conn.commit()
+                estimateprice = cursor.fetchall()
+                for row in estimateprice:
+                    print("The estimate total will be: $",row[0])
+                return
+            if choice == 'N' or 'n':
+                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+                carChoice(_conn,id)  
+        if ec == 3:
+            sql = ("""SELECT e_price FROM extraPackages WHERE e_packkey = 220;""")
+            cursor.execute(sql)
+            _conn.commit()
+            modelprice = cursor.fetchall()
+            for row in modelprice:
+                print("The base price will be: $",row[0])
+            print("Are you satisfied with your choices?")
+            choice = input("Y or N:\n")
+            if choice == 'Y' or 'y':
+                sql = """SELECT (b_price + m_price) as estimateTOTAL
+                FROM Brand,Model
+                WHERE b_brandkey = m_brandkey
+                AND b_name = 'Jeep'
+                AND m_name = 'Renegade';"""
+                cursor.execute(sql)
+                _conn.commit()
+                estimateprice = cursor.fetchall()
+                for row in estimateprice:
+                    print("The estimate total will be: $",row[0])
+                return
+            if choice == 'N' or 'n':
+                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+                carChoice(_conn,id)  
+    except Error as e:
+        print(e)
+
+        #---------------------------------------------------------------------        
+        #-------------------------END OF JEEP CHOICE--------------------------
         #---------------------------------------------------------------------
 
 
