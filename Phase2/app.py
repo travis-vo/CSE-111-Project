@@ -42,6 +42,17 @@ def userReturn(_conn,id):
         cursor.execute(sql,args)
         _conn.commit()
         data = cursor.fetchall()
+        if not data:
+            newval = 0
+            print("Entry not found")
+            print("1. Try again")
+            print("2. Sign Up as New Customer")
+            newval = int(input("Select a number:\n"))
+            print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+            if newval == 1:
+                userReturn(_conn,id)
+            if newval == 2:
+                userSign(_conn,id)
         #print(data) #prints user data
     except Error as e:
         print(e)
@@ -99,6 +110,7 @@ def brandChoice(_conn,id):
             brandprice = cursor.fetchall()
             for row in brandprice:
                 print("The base price will be: $",row[0])
+        
     except Error as e:
         print(e)
 
@@ -117,11 +129,12 @@ def connector(_conn):
     if val == 2:
         id = userReturn(_conn,id)
     #print(id)
-    if id != 0:
-        print('3. Select a Car Brand')
-        val = int(input("Select a number\n"))
-        if val == 3:
-            id = brandChoice(_conn,id)
+    #if id != 0:
+    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    print('3. Select a Car Brand')
+    val = int(input("Select a number\n"))
+    if val == 3:
+        id = brandChoice(_conn,id)
     
 def main():
     database = r"Phase2/database.sqlite"
