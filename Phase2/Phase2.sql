@@ -88,8 +88,11 @@ Values(200, 'LE Convenience', 100, 1000.00),
 (217, 'Accord Protection', 108, 314.00),
 (218, 'All-Season ProPack', 109, 394.00),
 (219, 'Civic Protection', 109, 287.00),
-(220, 'NONE', 110, 0.00),
-(221, 'NONE', 111, 0.00);
+(220, 'NONE', 0, 0.00),
+(221, 'Black Trim', 110, 453.00),
+(222, 'OffRoad Engine', 110, 1000.00),
+(223, 'Matte Paint', 111, 865.00),
+(224, 'Mazda Care', 111, 521.00);
 
 INSERT INTO estimatedQuote
 Values('qtotal1', 300, 50,'Toyota Brand'),
