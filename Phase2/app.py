@@ -1,5 +1,7 @@
 import sqlite3
 from sqlite3 import Error
+import time
+from time import sleep
 
 def openConnection(_dbFile):
     #change name of conn
@@ -22,13 +24,29 @@ def userSign(_conn,id):
     try:
         cursor = _conn.cursor()
         name = input("Please type in your first and last name:\n")
-        phone = input("Insert your phone number:\n")
-        address = input("Insert your address:\n")
-        sql = ("""INSERT INTO Customer(c_name,c_phone,c_address, c_ordernumber, c_custkey)
-        VALUES(?,?,?,1005,6)""")
-        args = [name,phone,address]
+
+        sql = ("""SELECT c_name FROM Customer WHERE c_name = ?;""")
+        args = [name]
         cursor.execute(sql,args)
         _conn.commit()
+        data = cursor.fetchall()
+        if not data:
+            phone = input("Insert your phone number:\n")
+            address = input("Insert your address:\n")
+            sql = ("""INSERT INTO Customer(c_name,c_phone,c_address, c_ordernumber, c_custkey)
+            VALUES(?,?,?,1005,6)""")
+            args = [name,phone,address]
+            cursor.execute(sql,args)
+            _conn.commit()
+        else:
+            print('Name already exists')
+            print('1. Try Again')
+            print('2. Move to Returning Customer')
+            newval = int(input("Please select one: "))
+            if newval == 1:
+                userSign(_conn,id)
+            if newval == 2:
+                userReturn(_conn,id)
     except Error as e:
         print(e)
 
@@ -182,9 +200,9 @@ def ToyotaCorollaPackage(_conn,id):
             for row in modelprice:
                 print("The base price will be: $",row[0])
             print("Are you satisfied with your choices?")
-            choice = input("Y or N:\n")
+            choice = input("Y or N: ")
             if choice == 'Y':
-                sql = """SELECT (b_price + m_price + e_price) as estimateTOTAL
+                sql = """SELECT ROUND((b_price + m_price + e_price),2) as estimateTOTAL
                 FROM Brand,Model,extraPackages
                 WHERE b_brandkey = m_brandkey
                 AND m_modelkey = e_modelkey
@@ -196,6 +214,22 @@ def ToyotaCorollaPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Toyota'
+                AND m_name = 'Corolla'
+                AND e_name = 'LE Convenience';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -210,7 +244,7 @@ def ToyotaCorollaPackage(_conn,id):
             print("Are you satisfied with your choices?")
             choice = input("Y or N:\n")
             if choice == 'Y':
-                sql = """SELECT (b_price + m_price + e_price) as estimateTOTAL
+                sql = """SELECT ROUND((b_price + m_price + e_price),2) as estimateTOTAL
                 FROM Brand,Model,extraPackages
                 WHERE b_brandkey = m_brandkey
                 AND m_modelkey = e_modelkey
@@ -222,6 +256,22 @@ def ToyotaCorollaPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Toyota'
+                AND m_name = 'Corolla'
+                AND e_name = 'SE Premium';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -236,7 +286,7 @@ def ToyotaCorollaPackage(_conn,id):
             print("Are you satisfied with your choices?")
             choice = input("Y or N:\n")
             if choice == 'Y':
-                sql = """SELECT (b_price + m_price) as estimateTOTAL
+                sql = """SELECT ROUND((b_price + m_price),2) as estimateTOTAL
                 FROM Brand,Model
                 WHERE b_brandkey = m_brandkey
                 AND b_name = 'Toyota'
@@ -246,11 +296,24 @@ def ToyotaCorollaPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model
+                WHERE b_brandkey = m_brandkey
+                AND b_name = 'Toyota'
+                AND m_name = 'Corolla';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
                 carChoice(_conn,id)  
-
     except Error as e:
         print(e)
 
@@ -273,7 +336,7 @@ def ToyotaRAVPackage(_conn,id):
             print("Are you satisfied with your choices?")
             choice = input("Y or N:\n")
             if choice == 'Y':
-                sql = """SELECT (b_price + m_price + e_price) as estimateTOTAL
+                sql = """SELECT ROUND((b_price + m_price + e_price),2) as estimateTOTAL
                 FROM Brand,Model,extraPackages
                 WHERE b_brandkey = m_brandkey
                 AND m_modelkey = e_modelkey
@@ -285,6 +348,22 @@ def ToyotaRAVPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Toyota'
+                AND m_name = 'RAV4'
+                AND e_name = 'XLE Grader Convenience';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -311,6 +390,22 @@ def ToyotaRAVPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Toyota'
+                AND m_name = 'RAV4'
+                AND e_name = 'XLE Grader Weather';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -335,12 +430,27 @@ def ToyotaRAVPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model
+                WHERE b_brandkey = m_brandkey
+                AND b_name = 'Toyota'
+                AND m_name = 'RAV4';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
                 carChoice(_conn,id)  
     except Error as e:
         print(e)
+        
         #---------------------------------------------------------------------        
         #------------------------END OF TOYOTA CHOICE-------------------------
         #---------------------------------------------------------------------
@@ -413,6 +523,22 @@ def FordMustangPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Ford'
+                AND m_name = 'Mustang'
+                AND e_name = 'GT Performance';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -439,6 +565,22 @@ def FordMustangPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Ford'
+                AND m_name = 'Mustang'
+                AND e_name = 'Carbon Sport Interior';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -463,6 +605,20 @@ def FordMustangPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model
+                WHERE b_brandkey = m_brandkey
+                AND b_name = 'Ford'
+                AND m_name = 'Mustang';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -502,6 +658,22 @@ def FordFusionPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Ford'
+                AND m_name = 'Fusion'
+                AND e_name = 'All-Wheel-Drive';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -528,6 +700,22 @@ def FordFusionPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Ford'
+                AND m_name = 'Fusion'
+                AND e_name = 'Co-Pilot360';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -552,6 +740,20 @@ def FordFusionPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model
+                WHERE b_brandkey = m_brandkey
+                AND b_name = 'Ford'
+                AND m_name = 'Fusion';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -594,7 +796,7 @@ def MercedesModel(_conn,id):
         else:
             print('Not a valid number')
             print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-            FordModel(_conn,id)
+            MercedesModel(_conn,id)
     except Error as e:
         print(e)
     
@@ -630,6 +832,22 @@ def MercedesAMGPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Mercedes'
+                AND m_name = 'AMG GT'
+                AND e_name = 'Aerodynamics';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -656,6 +874,22 @@ def MercedesAMGPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Mercedes'
+                AND m_name = 'AMG GT'
+                AND e_name = 'Lane Tracking';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -680,6 +914,20 @@ def MercedesAMGPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model
+                WHERE b_brandkey = m_brandkey
+                AND b_name = 'Mercedes'
+                AND m_name = 'AMG GT';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -719,6 +967,22 @@ def MercedesGLEPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Mercedes'
+                AND m_name = 'GLE SUV'
+                AND e_name = 'Comfort';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -745,6 +1009,22 @@ def MercedesGLEPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Mercedes'
+                AND m_name = 'GLE SUV'
+                AND e_name = 'Driver Assistance';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -769,6 +1049,20 @@ def MercedesGLEPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model
+                WHERE b_brandkey = m_brandkey
+                AND b_name = 'Mercedes'
+                AND m_name = 'GLE SUV';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -780,7 +1074,7 @@ def MercedesGLEPackage(_conn,id):
         #---------------------------------------------------------------------
 
         #---------------------------------------------------------------------        
-        #------------------------START OF JEEP CHOICE---------------------
+        #--------------------------START OF JEEP CHOICE-----------------------
         #---------------------------------------------------------------------
 
 def JeepModel(_conn,id):
@@ -811,7 +1105,7 @@ def JeepModel(_conn,id):
         else:
             print('Not a valid number')
             print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-            FordModel(_conn,id)
+            JeepModel(_conn,id)
     except Error as e:
         print(e)
     
@@ -847,6 +1141,22 @@ def JeepWranglerPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Jeep'
+                AND m_name = 'Wrangler'
+                AND e_name = 'Heavy-Duty Electrical';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -873,6 +1183,22 @@ def JeepWranglerPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Jeep'
+                AND m_name = 'Wrangler'
+                AND e_name = 'Smokers';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -897,6 +1223,20 @@ def JeepWranglerPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model
+                WHERE b_brandkey = m_brandkey
+                AND b_name = 'Jeep'
+                AND m_name = 'Wrangler';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -936,6 +1276,22 @@ def JeepRenegadePackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Jeep'
+                AND m_name = 'Renegade'
+                AND e_name = 'Advanced Technology';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -962,6 +1318,22 @@ def JeepRenegadePackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Jeep'
+                AND m_name = 'Renegade'
+                AND e_name = 'Uconnect 8.4';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -986,6 +1358,21 @@ def JeepRenegadePackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Jeep'
+                AND m_name = 'Renegade';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -1028,7 +1415,7 @@ def HondaModel(_conn,id):
         else:
             print('Not a valid number')
             print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-            FordModel(_conn,id)
+            HondaModel(_conn,id)
     except Error as e:
         print(e)
     
@@ -1064,6 +1451,22 @@ def HondaAccordPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Honda'
+                AND m_name = 'Accord'
+                AND e_name = 'All-Season Protection';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -1090,6 +1493,22 @@ def HondaAccordPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Honda'
+                AND m_name = 'Accord'
+                AND e_name = 'Accord Protection';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -1114,6 +1533,20 @@ def HondaAccordPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model
+                WHERE b_brandkey = m_brandkey
+                AND b_name = 'Honda'
+                AND m_name = 'Accord';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -1153,6 +1586,22 @@ def HondaCivicPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Honda'
+                AND m_name = 'Civic'
+                AND e_name = 'All-Season ProPack';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -1179,6 +1628,22 @@ def HondaCivicPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Honda'
+                AND m_name = 'Civic'
+                AND e_name = 'Civic Protection';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -1203,6 +1668,20 @@ def HondaCivicPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model
+                WHERE b_brandkey = m_brandkey
+                AND b_name = 'Honda'
+                AND m_name = 'Civic';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -1245,7 +1724,7 @@ def MazdaModel(_conn,id):
         else:
             print('Not a valid number')
             print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-            FordModel(_conn,id)
+            MazdaModel(_conn,id)
     except Error as e:
         print(e)
     
@@ -1281,6 +1760,22 @@ def MazdaMiataPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Mazada'
+                AND m_name = 'MX-5 Miata'
+                AND e_name = 'Black Trim';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -1307,6 +1802,22 @@ def MazdaMiataPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Mazada'
+                AND m_name = 'MX-5 Miata'
+                AND e_name = 'OffRoad Engine';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -1331,6 +1842,20 @@ def MazdaMiataPackage(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model
+                WHERE b_brandkey = m_brandkey
+                AND b_name = 'Mazada'
+                AND m_name = 'MX-5 Miata';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -1370,6 +1895,22 @@ def Mazda6Package(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Mazda'
+                AND m_name = 'Mazda6'
+                AND e_name = 'Matte Paint';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -1396,6 +1937,22 @@ def Mazda6Package(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price + e_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model,extraPackages
+                WHERE b_brandkey = m_brandkey
+                AND m_modelkey = e_modelkey
+                AND b_name = 'Mazda'
+                AND m_name = 'Mazda6'
+                AND e_name = 'Mazda Care';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -1420,6 +1977,20 @@ def Mazda6Package(_conn,id):
                 estimateprice = cursor.fetchall()
                 for row in estimateprice:
                     print("The estimate total will be: $",row[0])
+                sql = """SELECT ROUND(((b_price + m_price) * 1.0725),2) as verifiedTOTAL
+                FROM Brand,Model
+                WHERE b_brandkey = m_brandkey
+                AND b_name = 'Mazda'
+                AND m_name = 'Mazda6';"""
+                cursor.execute(sql)
+                _conn.commit()
+                verifiedprice = cursor.fetchall()
+                print("Fetching verified quote, please hold")
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                print("...") ; sleep(1.0)
+                for row in verifiedprice:
+                    print("The verified total with tax will be: $",row[0])
                 return
             if choice == 'N':
                 print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -1427,7 +1998,7 @@ def Mazda6Package(_conn,id):
     except Error as e:
         print(e)
         #---------------------------------------------------------------------        
-        #-------------------------END OF MERCEDES CHOICE----------------------
+        #---------------------------END OF MAZDA CHOICE-----------------------
         #---------------------------------------------------------------------
 
 
@@ -1436,7 +2007,6 @@ def connector(_conn):
     id = 0
     val = 0
     bc = 0
-    print("~~~~~~~ Vo & Duong Car Dealership ~~~~~~~")
     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     print('1. New Customer')
     print('2. Returning Customer')
@@ -1444,8 +2014,13 @@ def connector(_conn):
     val = int(input("Select a number\n"))
     if val == 1:
         id = userSign(_conn,id)
-    if val == 2:
+    elif val == 2:
         id = userReturn(_conn,id)
+    else:
+        print("Not a valid value")
+        connector(_conn)
+
+    
     #print(id)
     #if id != 0:
     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -1457,6 +2032,7 @@ def main():
     # create a database connection
     conn = openConnection(database)
     with conn:
+        print("~~~~~~~ Vo & Duong Car Dealership ~~~~~~~")
         connector(conn)
         #option(conn)
         #change print statement
